@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电磁场与电磁波 - 学术级虚拟实验室</title>
+
+    <!-- 第三方库 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ========== 左侧中枢控制台 ========== -->
+    <div id="sidebar">
+        <div class="tabs">
+            <h2 class="text-xs font-bold text-slate-400 mb-1 tracking-widest uppercase text-center border-b border-slate-800 pb-2">
+                EM Field &amp; Waves Laboratory
+            </h2>
+            <button class="tab-btn active" onclick="switchChapter(1)">
+                <span>1. 均匀平面波与能流</span>
+                <span class="status">解析解</span>
+            </button>
+            <button class="tab-btn" onclick="switchChapter(2)">
+                <span>2. 边界反射、折射与趋肤</span>
+                <span class="status">菲涅尔</span>
+            </button>
+            <button class="tab-btn" onclick="switchChapter(3)">
+                <span>3. 导行电磁波 (波导)</span>
+                <span class="status">高阶模</span>
+            </button>
+            <button class="tab-btn" onclick="switchChapter(4)">
+                <span>4. 电磁辐射与天线</span>
+                <span class="status">流场连续</span>
+            </button>
+        </div>
+
+        <div id="control-panels-container">
+
+            <!-- ===== 第一章：均匀平面波 ===== -->
+            <div id="panel-ch1" class="control-panel active">
+                <div>
+                    <div class="section-title">坡印廷能流矢量 (Poynting)</div>
+                    <label class="flex items-center gap-2 cursor-pointer bg-[#181b1e] p-2 rounded border border-[#2e343b] hover:bg-[#2b3036] transition">
+                        <input type="checkbox" id="ch1-show-poynting" checked class="w-4 h-4 accent-slate-400">
+                        <span class="text-xs font-semibold text-slate-300">开启能流路径 (S)</span>
+                    </label>
+                    <p class="text-[10px] text-slate-500 mt-2">
+                        绿色矢量表示 S⃗ = E⃗ × H⃗ 的瞬时能流矢量。在有损介质中，能量随阻抗角变大而剧烈衰减。
+                    </p>
+                </div>
+
+                <div>
+                    <div class="section-title">偏振/极化物理状态</div>
+                    <div class="grid-3 mb-2">
+                        <button id="ch1-btn-linear" class="btn btn-primary" onclick="setPresetCh1('linear')">线极化</button>
+                        <button id="ch1-btn-circular" class="btn" onclick="setPresetCh1('circular')">圆极化</button>
+                        <button id="ch1-btn-elliptical" class="btn" onclick="setPresetCh1('elliptical')">椭圆极化</button>
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-header"><span>正交分量相位差 (δ)</span><span id="ch1-phase-val">0°</span></div>
+                        <input type="range" id="ch1-phase-slider" min="0" max="360" value="0">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">损耗介质色散与衰减</div>
+                    <div class="slider-wrap">
+                        <div class="slider-header"><span>本征阻抗角 (θ_η)</span><span id="ch1-imp-val">0°</span></div>
+                        <input type="range" id="ch1-imp-slider" min="0" max="45" value="0">
+                        <p class="text-[10px] text-slate-500 mt-1">
+                            阻抗角 θ_η &gt; 0 表示介质存在损耗，磁场产生相位滞后，且场振幅沿波行方向呈现指数级衰减 e^(-αz)。
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">系统状态控制</div>
+                    <button class="btn" id="ch1-btn-play" onclick="togglePlay()">⏸ 暂停解析时钟</button>
+                    <div class="grid-2 mt-2">
+                        <button class="btn" onclick="gsapCameraMove(22, 16, 28)">三维侧视</button>
+                        <button class="btn" onclick="gsapCameraMove(0, 0, 36)">迎波轴正视</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 第二章：反射与折射 ===== -->
+            <div id="panel-ch2" class="control-panel">
+                <div>
+                    <div class="section-title">入射平面几何</div>
+                    <div class="slider-wrap mb-2">
+                        <div class="slider-header"><span>入射角 (θi)</span><span id="ch2-angle-val">45°</span></div>
+                        <input type="range" id="ch2-angle-slider" min="0" max="80" value="45">
+                    </div>
+                    <div class="grid-2">
+                        <button id="ch2-btn-te" class="btn btn-primary" onclick="setPolarizationCh2('TE')">TE 极化 (E⊥平面)</button>
+                        <button id="ch2-btn-tm" class="btn" onclick="setPolarizationCh2('TM')">TM 极化 (E∥平面)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">透射媒质 2 物理参量</div>
+                    <div class="slider-wrap mb-3">
+                        <div class="slider-header"><span>相对折射率 (n2 / n1)</span><span id="ch2-n2-val">1.50</span></div>
+                        <input type="range" id="ch2-n2-slider" min="0.5" max="3.0" step="0.05" value="1.50">
+                    </div>
+                    <div class="slider-wrap">
+                        <div class="slider-header"><span>等效电导率 (σ)</span><span id="ch2-sigma-val">0.0</span></div>
+                        <input type="range" id="ch2-sigma-slider" min="0" max="5.0" step="0.1" value="0">
+                        <p class="text-[10px] text-slate-500 mt-1">
+                            调整衰减电导率，可以清晰观测到折射波按 e^(-αz) 指数律在良导体中衰减的物理过程。
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">观测视景</div>
+                    <div class="grid-2">
+                        <button class="btn" onclick="gsapCameraMove(32, 10, 15)">边界全景</button>
+                        <button class="btn" onclick="gsapCameraMove(0, 32, 15)">分界面正俯视</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 第三章：导行波 ===== -->
+            <div id="panel-ch3" class="control-panel">
+                <div>
+                    <div class="section-title">矩形波导传播模式 (m, n)</div>
+                    <div class="grid-2 gap-2">
+                        <button id="ch3-mode-te10" class="btn btn-primary" onclick="setWaveguideMode('TE10')">TE10 (主模)</button>
+                        <button id="ch3-mode-te20" class="btn" onclick="setWaveguideMode('TE20')">TE20</button>
+                        <button id="ch3-mode-te11" class="btn" onclick="setWaveguideMode('TE11')">TE11 (高阶)</button>
+                        <button id="ch3-mode-tm11" class="btn" onclick="setWaveguideMode('TM11')">TM11 (高阶)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">色散截止效应 (f / fc)</div>
+                    <div class="slider-wrap">
+                        <div class="slider-header"><span>工作归一化频率</span><span id="ch3-freq-val">1.50x</span></div>
+                        <input type="range" id="ch3-freq-slider" min="0.50" max="2.00" step="0.05" value="1.50">
+
+                        <!-- 动态截止指示灯 -->
+                        <div id="ch3-status-badge" class="mt-3 flex items-center justify-between p-2 rounded border bg-[#111315]">
+                            <span class="text-xs font-bold text-slate-400">传输状态:</span>
+                            <span id="ch3-status-text" class="text-xs font-black tracking-wider px-2 py-0.5 rounded">PROPAGATING</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-2">
+                            若工作频率比值低于 1.00，波导转为截止状态，波能量被严格限制无法往深处向前输运，沿波导轴向急速呈指数衰减。
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">空间解剖观测</div>
+                    <div class="grid-2">
+                        <button class="btn" onclick="gsapCameraMove(18, 12, 28)">腔体透视</button>
+                        <button class="btn" onclick="gsapCameraMove(0, 0, 35)">横向截面</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 第四章：电磁辐射 ===== -->
+            <div id="panel-ch4" class="control-panel">
+                <div>
+                    <div class="section-title">连续空间物理过渡</div>
+                    <div class="slider-wrap mb-2">
+                        <div class="slider-header"><span>归一化观测距离 (r / λ)</span><span id="ch4-dist-val">0.50λ</span></div>
+                        <input type="range" id="ch4-dist-slider" min="0.10" max="4.00" step="0.05" value="0.50">
+                    </div>
+                    <div class="grid-2 mt-1">
+                        <button id="ch4-btn-near-shortcut" class="btn btn-primary" onclick="setAntennaPreset('near')">切换近感区</button>
+                        <button id="ch4-btn-far-shortcut" class="btn" onclick="setAntennaPreset('far')">切换远辐射区</button>
+                    </div>
+                </div>
+
+                <!-- 近场说明 -->
+                <div id="ch4-near-control">
+                    <div class="section-title">偶极子电场线动力学</div>
+                    <p class="text-xs text-slate-400 leading-relaxed bg-[#14171a] p-2.5 rounded border border-slate-800">
+                        <span class="text-red-400 font-bold block mb-1">感应场主导 (1/r³):</span>
+                        严格基于瞬时麦克斯韦方程，实时采用偶极子解析流函数数值生成流场曲线。
+                        在偶极子收缩阶段，场线在根部会发生极化断裂并闭合，最后像波一样剥离并弹射出去，变为独立的辐射场。
+                    </p>
+                </div>
+
+                <!-- 远场说明 -->
+                <div id="ch4-pattern-control" class="hidden">
+                    <div class="section-title">半波天线 3D 辐射方向图</div>
+                    <label class="flex items-center gap-2 cursor-pointer bg-[#202326] p-2 rounded border border-[#2F3438]">
+                        <input type="checkbox" id="ch4-show-donut" checked class="w-4 h-4 accent-slate-400">
+                        <span class="text-xs font-semibold text-slate-300">渲染 3D 经典甜甜圈面 (F(θ))</span>
+                    </label>
+                    <p class="text-[10px] text-slate-500 mt-2">
+                        远区中电磁场蜕变为辐射波面。此处渲染了严格物理推导下的半波对称振子三维辐射瓣结构。
+                    </p>
+                </div>
+
+                <div>
+                    <div class="section-title">视角标校</div>
+                    <button class="btn" onclick="gsapCameraMove(18, 12, 18)">默认辐射视角</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========== 右侧 3D 画布区域 ========== -->
+    <div id="canvas-wrapper">
+        <div id="canvas-container"></div>
+
+        <!-- 第一章数学面板 -->
+        <div id="math-ch1" class="math-panel active">
+            <h2 class="text-xs text-slate-400 mb-2 border-b border-slate-700 pb-1 font-semibold">
+                均匀平面波解析解 (含损耗介质衰减项)
+            </h2>
+            <div id="eq-ch1-E" class="text-xs text-red-400 py-1 font-mono"></div>
+            <div id="eq-ch1-H" class="text-xs text-blue-400 py-1 font-mono"></div>
+            <div id="eq-ch1-S" class="text-xs text-emerald-400 py-1 mt-1 border-t border-slate-800/80 pt-2 font-mono"></div>
+        </div>
+
+        <!-- 第二章数学面板 -->
+        <div id="math-ch2" class="math-panel">
+            <h2 class="text-xs text-slate-400 mb-1 border-b border-slate-700 pb-1 font-semibold">
+                菲涅尔折射公式与趋肤极限
+            </h2>
+            <div id="eq-ch2-fresnel" class="text-xs text-blue-300 py-1 font-mono"></div>
+            <div id="eq-ch2-snell" class="text-xs text-orange-300 py-1 font-mono"></div>
+            <div id="eq-ch2-skin" class="text-xs text-red-400 py-1 mt-1 border-t border-slate-800/80 pt-1 font-mono"></div>
+        </div>
+
+        <!-- 第三章数学面板 -->
+        <div id="math-ch3" class="math-panel">
+            <h2 class="text-xs text-slate-400 mb-2 border-b border-slate-700 pb-1 font-semibold">
+                金属空腔矩形波导解析色散理论
+            </h2>
+            <div id="eq-ch3-cutoff" class="text-xs text-cyan-300 py-1 font-mono"></div>
+            <div id="eq-ch3-beta" class="text-xs text-indigo-300 py-1 font-mono"></div>
+        </div>
+
+        <!-- 第四章数学面板 -->
+        <div id="math-ch4" class="math-panel">
+            <h2 class="text-xs text-slate-400 mb-2 border-b border-slate-700 pb-1 font-semibold">
+                赫兹振荡偶极子流函数动力学模型
+            </h2>
+            <div id="eq-ch4-model" class="text-xs text-yellow-300 py-1 font-mono"></div>
+        </div>
+
+        <!-- 悬浮图例 -->
+        <div id="legend-ch" class="legend active font-mono">
+            <div class="flex items-center text-red-400">
+                <span class="color-dot bg-red-500"></span> 电场强度 (E)
+            </div>
+            <div class="flex items-center text-blue-400">
+                <span class="color-dot bg-blue-500"></span> 磁感应强度 (H)
+            </div>
+            <div id="legend-poynting" class="flex items-center text-emerald-400">
+                <span class="color-dot bg-emerald-500"></span> 瞬时能流 (S)
+            </div>
+        </div>
+
+        <!-- 2D 画中画示波器 (MATLAB 学术绘图风) -->
+        <div id="pip-container">
+            <h3 class="text-[10px] text-slate-400 font-bold border-b border-slate-800 pb-1 mb-1 tracking-wider text-center font-mono">
+                极化矢量轨迹仪 (PiP Scope)
+            </h3>
+            <canvas id="pip-canvas" class="flex-1 w-full bg-[#08090a] rounded-sm"></canvas>
+        </div>
+    </div>
+
+    <!-- ========== JavaScript 模块 (按依赖顺序加载) ========== -->
+    <!-- 3D 渲染引擎 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- 1. 核心总线：引擎初始化、场景管理、动画循环、全局工具 -->
+    <script src="js/core.js"></script>
+
+    <!-- 2. PiP 示波器模块 (各章节共用) -->
+    <script src="js/pip-scope.js"></script>
+
+    <!-- 3. 四个章节的物理模拟模块 -->
+    <script src="js/ch1-plane-wave.js"></script>
+    <script src="js/ch2-boundary-reflection.js"></script>
+    <script src="js/ch3-waveguide.js"></script>
+    <script src="js/ch4-antenna-radiation.js"></script>
+
+</body>
+</html>
