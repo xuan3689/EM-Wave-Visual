@@ -209,6 +209,14 @@ input[type=range]::-webkit-slider-thumb {
     z-index: 10;
 }
 
+/* 第0章麦克斯韦方程组面板加宽 */
+#math-ch0 {
+    min-width: 520px;
+}
+    display: none;
+    z-index: 10;
+}
+
 .math-panel.active {
     display: block;
 }
@@ -261,9 +269,67 @@ input[type=range]::-webkit-slider-thumb {
     z-index: 10;
 }
 
-/* ========== 隐藏类 ========== */
-.hidden {
-    display: none !important;
+/* ========== 第0章公式总览页 ========== */
+#formula-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background: #0a0b0d;
+    display: none;
+    z-index: 5;
+    padding: 2rem 2.5rem;
+}
+
+#formula-overlay.active {
+    display: block;
+}
+
+.formula-chapter {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    background: #0f1114;
+    border: 1px solid #1e2126;
+    border-radius: 0.375rem;
+}
+
+.formula-chapter h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #1e2126;
+}
+
+.formula-chapter h3 .ch-tag {
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.formula-item {
+    margin: 0.5rem 0;
+}
+
+.formula-item .formula-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-bottom: 0.2rem;
+    font-family: 'Consolas', monospace;
+}
+
+.formula-item .formula-body {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.75rem;
+    background: #08090a;
+    border-radius: 3px;
+    border-left: 2px solid #2e343b;
 }
 
 /* ========== 动画 ========== */

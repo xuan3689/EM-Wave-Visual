@@ -21,7 +21,11 @@
             <h2 class="text-xs font-bold text-slate-400 mb-1 tracking-widest uppercase text-center border-b border-slate-800 pb-2">
                 EM Field &amp; Waves Laboratory
             </h2>
-            <button class="tab-btn active" onclick="switchChapter(1)">
+            <button class="tab-btn active" onclick="switchChapter(0)">
+                <span>0. 麦克斯韦方程组</span>
+                <span class="status">总纲</span>
+            </button>
+            <button class="tab-btn" onclick="switchChapter(1)">
                 <span>1. 均匀平面波与能流</span>
                 <span class="status">解析解</span>
             </button>
@@ -41,8 +45,38 @@
 
         <div id="control-panels-container">
 
+            <!-- ===== 第0章：麦克斯韦方程组 ===== -->
+            <div id="panel-ch0" class="control-panel active">
+                <div>
+                    <div class="section-title">导航</div>
+                    <p class="text-xs text-slate-400 leading-relaxed bg-[#14171a] p-3 rounded border border-slate-800">
+                        本实验室围绕<strong class="text-slate-200">麦克斯韦方程组</strong>展开，右侧公式面板陈列了微分形式的四大方程。
+                        <br><br>
+                        点击上方标签切换章节，探索各方程对应的物理现象：
+                    </p>
+                    <div class="mt-3 flex flex-col gap-2 text-xs">
+                        <div class="flex items-start gap-2 bg-[#14171a] p-2.5 rounded border border-slate-800/60">
+                            <span class="text-red-400 font-bold shrink-0">①</span>
+                            <span class="text-slate-400">均匀平面波与能流 — 法拉第定律 + 安培定律的空间波动解，坡印廷矢量 S = E × H 描述能量输运</span>
+                        </div>
+                        <div class="flex items-start gap-2 bg-[#14171a] p-2.5 rounded border border-slate-800/60">
+                            <span class="text-orange-400 font-bold shrink-0">②</span>
+                            <span class="text-slate-400">边界反射/折射与趋肤 — 电场/磁场在介质分界面的边界条件，菲涅尔公式决定反射与透射系数</span>
+                        </div>
+                        <div class="flex items-start gap-2 bg-[#14171a] p-2.5 rounded border border-slate-800/60">
+                            <span class="text-cyan-400 font-bold shrink-0">③</span>
+                            <span class="text-slate-400">导行电磁波 (波导) — 电磁场在金属空腔中的横电/横磁模式，截止频率与色散关系</span>
+                        </div>
+                        <div class="flex items-start gap-2 bg-[#14171a] p-2.5 rounded border border-slate-800/60">
+                            <span class="text-yellow-400 font-bold shrink-0">④</span>
+                            <span class="text-slate-400">电磁辐射与天线 — 赫兹偶极子产生辐射场，感应场过渡到远区辐射，半波振子方向图</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ===== 第一章：均匀平面波 ===== -->
-            <div id="panel-ch1" class="control-panel active">
+            <div id="panel-ch1" class="control-panel">
                 <div>
                     <div class="section-title">坡印廷能流矢量 (Poynting)</div>
                     <label class="flex items-center gap-2 cursor-pointer bg-[#181b1e] p-2 rounded border border-[#2e343b] hover:bg-[#2b3036] transition">
@@ -225,8 +259,13 @@
     <div id="canvas-wrapper">
         <div id="canvas-container"></div>
 
+        <!-- 第0章公式总览覆盖层（全屏，隐藏3D场景） -->
+        <div id="formula-overlay">
+            <div id="formula-content"></div>
+        </div>
+
         <!-- 第一章数学面板 -->
-        <div id="math-ch1" class="math-panel active">
+        <div id="math-ch1" class="math-panel">
             <h2 class="text-xs text-slate-400 mb-2 border-b border-slate-700 pb-1 font-semibold">
                 均匀平面波解析解 (含损耗介质衰减项)
             </h2>

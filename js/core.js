@@ -6,12 +6,13 @@
 
 // ---------- 全局状态 ----------
 let scene, camera, renderer, controls;
-let currentChapter = 1;
+let currentChapter = 0;
 let globalTime = 0;
 let isPlaying = true;
 
 // 各章节独立的 3D 场景组
 const sceneGroups = {
+    ch0: new THREE.Group(),
     ch1: new THREE.Group(),
     ch2: new THREE.Group(),
     ch3: new THREE.Group(),
@@ -53,9 +54,7 @@ function initThree() {
     gridHelper.position.y = -5;
     scene.add(gridHelper);
 
-    // 将四个章节的场景组挂载到主场景
-
-    // 将四个章节的场景组挂载到主场景
+    // 将五个章节的场景组挂载到主场景
     for (let key in sceneGroups) {
         scene.add(sceneGroups[key]);
     }
@@ -72,25 +71,35 @@ function initThree() {
 window.switchChapter = function (chapterNum) {
     currentChapter = chapterNum;
 
-    // 标签高亮
+    // 标签高亮 (第0章是第一个tab，idx === chapterNum)
     document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-        btn.classList.toggle('active', idx + 1 === chapterNum);
+        btn.classList.toggle('active', idx === chapterNum);
     });
     // 控制面板切换
     document.querySelectorAll('.control-panel').forEach((panel, idx) => {
-        panel.classList.toggle('active', idx + 1 === chapterNum);
+        panel.classList.toggle('active', idx === chapterNum);
     });
 
-    // 数学公式面板切换
+    // 数学公式面板切换 (第0章用全屏overlay)
+    const formulaOverlay = document.getElementById('formula-overlay');
+    if (chapterNum === 0) {
+        formulaOverlay.classList.add('active');
+    } else {
+        formulaOverlay.classList.remove('active');
+    }
     document.getElementById('math-ch1').classList.toggle('active', chapterNum === 1);
     document.getElementById('math-ch2').classList.toggle('active', chapterNum === 2);
     document.getElementById('math-ch3').classList.toggle('active', chapterNum === 3);
     document.getElementById('math-ch4').classList.toggle('active', chapterNum === 4);
 
-    // 图例始终显示，但能流矢量只在第一章显示
-    document.getElementById('legend-ch').classList.toggle('active', true);
+    // 图例在 ch0 隐藏，其余章节显示
+    document.getElementById('legend-ch').classList.toggle('active', chapterNum > 0);
     document.getElementById('legend-poynting').style.display =
         chapterNum === 1 ? 'flex' : 'none';
+
+    // 第0章隐藏图例和示波器
+    document.getElementById('pip-container').style.display =
+        chapterNum === 0 ? 'none' : 'flex';
 
     // 切换可见的场景组
     for (let key in sceneGroups) {
@@ -98,7 +107,11 @@ window.switchChapter = function (chapterNum) {
     }
 
     // 各章节默认相机位置与公式刷新
-    if (chapterNum === 1) {
+    if (chapterNum === 0) {
+        gsapCameraMove(0, 0, 25);
+        controls.target.set(0, 0, 0);
+        updateMathCh0();
+    } else if (chapterNum === 1) {
         gsapCameraMove(22, 16, 28);
         controls.target.set(0, 0, 15);
         updateMathCh1();
@@ -124,7 +137,8 @@ function animate() {
     if (isPlaying) globalTime += 0.015;
 
     // 按当前激活章节调度更新
-    if (currentChapter === 1) updateChapter1();
+    if (currentChapter === 0) { /* 第0章无动态内容 */ }
+    else if (currentChapter === 1) updateChapter1();
     else if (currentChapter === 2) updateChapter2();
     else if (currentChapter === 3) updateChapter3();
     else if (currentChapter === 4) updateChapter4();
@@ -171,14 +185,111 @@ function _setArr(arrow, x, y, z, scale = 0.5) {
     }
 }
 
+// ---------- 第0章：麦克斯韦方程组 ----------
+function initChapter0() {
+    // 第0章 3D 场景为空，只展示公式面板
+}
+
+function updateChapter0() {
+    // 无动态内容
+}
+
+function updateMathCh0() {
+    const container = document.getElementById('formula-content');
+
+    // 按章节组织的公式数据
+    const chapters = [
+        {
+            title: '第0章 · 麦克斯韦方程组（总纲）',
+            tag: '根基',
+            tagColor: '#8b5cf6',
+            items: [
+                { label: '∇·E = ρ/ε₀  — 电场高斯定律（电场由电荷激发）', tex: '\\nabla \\cdot \\vec{E} = \\frac{\\rho}{\\varepsilon_0}' },
+                { label: '∇·H = 0  — 磁场高斯定律（磁单极子不存在）', tex: '\\nabla \\cdot \\vec{H} = 0' },
+                { label: '∇×E = −μ₀∂H/∂t  — 法拉第定律（变化的磁场产生电场）', tex: '\\nabla \\times \\vec{E} = -\\mu_0 \\frac{\\partial \\vec{H}}{\\partial t}' },
+                { label: '∇×H = J + ε₀∂E/∂t  — 安培-麦克斯韦定律（电流+变化的电场产生磁场）', tex: '\\nabla \\times \\vec{H} = \\vec{J} + \\varepsilon_0 \\frac{\\partial \\vec{E}}{\\partial t}' }
+            ]
+        },
+        {
+            title: '第一章 · 均匀平面波与能流',
+            tag: '波动解',
+            tagColor: '#ef4444',
+            items: [
+                { label: '波动方程（无源区域）', tex: '\\nabla^2 \\vec{E} = \\mu\\varepsilon \\frac{\\partial^2 \\vec{E}}{\\partial t^2}' },
+                { label: '均匀平面波电场解（z向传播）', tex: '\\vec{E}(z,t) = \\text{Re}\\left[ (E_x \\hat{x} + E_y e^{j\\delta} \\hat{y}) e^{j(\\omega t - kz)} \\right]' },
+                { label: '磁场与电场的关系（本征阻抗）', tex: '\\vec{H} = \\frac{1}{\\eta} \\hat{z} \\times \\vec{E}, \\quad \\eta = \\sqrt{\\frac{\\mu}{\\varepsilon}}' },
+                { label: '坡印廷矢量（能流密度）', tex: '\\vec{S} = \\vec{E} \\times \\vec{H}' },
+                { label: '有损介质中的衰减', tex: '\\vec{E}(z,t) = \\vec{E}_0 e^{-\\alpha z} \\cos(\\omega t - kz), \\quad \\alpha = k \\tan(\\theta_\\eta / 2)' }
+            ]
+        },
+        {
+            title: '第二章 · 边界反射、折射与趋肤',
+            tag: '菲涅尔',
+            tagColor: '#f59e0b',
+            items: [
+                { label: '斯涅尔折射定律', tex: 'n_1 \\sin\\theta_i = n_2 \\sin\\theta_t' },
+                { label: 'TE极化反射系数', tex: 'R_{TE} = \\frac{n_1 \\cos\\theta_i - n_2 \\cos\\theta_t}{n_1 \\cos\\theta_i + n_2 \\cos\\theta_t}' },
+                { label: 'TM极化反射系数', tex: 'R_{TM} = \\frac{n_2 \\cos\\theta_i - n_1 \\cos\\theta_t}{n_2 \\cos\\theta_i + n_1 \\cos\\theta_t}' },
+                { label: '临界角（全反射条件）', tex: '\\theta_c = \\arcsin\\left(\\frac{n_2}{n_1}\\right), \\quad \\theta_i \\geq \\theta_c \\Rightarrow \\text{全反射}' },
+                { label: '趋肤深度（良导体衰减）', tex: '\\delta_s = \\frac{1}{\\alpha} = \\frac{1}{\\sigma \\cdot 0.45}' }
+            ]
+        },
+        {
+            title: '第三章 · 导行电磁波（矩形波导）',
+            tag: '色散',
+            tagColor: '#06b6d4',
+            items: [
+                { label: '矩形波导 TE/TM 模式截止频率', tex: 'f_c = \\frac{c}{2} \\sqrt{\\left(\\frac{m}{a}\\right)^2 + \\left(\\frac{n}{b}\\right)^2}' },
+                { label: 'TE₁₀ 主模场分布（E场）', tex: 'E_y = \\sin\\left(\\frac{\\pi x}{a}\\right) e^{j(\\omega t - \\beta z)}' },
+                { label: '传播常数 β（f > f_c）', tex: '\\beta = k \\sqrt{1 - (f_c / f)^2}' },
+                { label: '截止状态的衰减常数 α（f < f_c）', tex: '\\alpha = k_c \\sqrt{1 - (f / f_c)^2}' }
+            ]
+        },
+        {
+            title: '第四章 · 电磁辐射与天线',
+            tag: '辐射',
+            tagColor: '#d97706',
+            items: [
+                { label: '赫兹偶极子近场流函数', tex: '\\psi(r,\\theta,t) = \\sin^2\\theta \\left[ \\frac{\\cos(\\omega t - r)}{r} + \\frac{\\sin(\\omega t - r)}{r^2} \\right]' },
+                { label: '半波振子远场方向图函数', tex: 'F(\\theta) = \\left| \\frac{\\cos\\left(\\frac{\\pi}{2}\\cos\\theta\\right)}{\\sin\\theta} \\right|' },
+                { label: '远区辐射电场', tex: 'E_\\theta = j\\eta \\frac{I_0 e^{-jkr}}{2\\pi r} F(\\theta)' }
+            ]
+        }
+    ];
+
+    // 构建 HTML
+    let html = '';
+    chapters.forEach((ch, idx) => {
+        html += `<div class="formula-chapter">`;
+        html += `<h3><span class="ch-tag" style="background:${ch.tagColor}22;color:${ch.tagColor};border:1px solid ${ch.tagColor}44">${ch.tag}</span> ${ch.title}</h3>`;
+        ch.items.forEach((item) => {
+            html += `<div class="formula-item">`;
+            html += `<div class="formula-label">${item.label}</div>`;
+            html += `<div class="formula-body" id="eq-ch0-${idx}-${ch.items.indexOf(item)}"></div>`;
+            html += `</div>`;
+        });
+        html += `</div>`;
+    });
+    container.innerHTML = html;
+
+    // 渲染 KaTeX
+    chapters.forEach((ch, idx) => {
+        ch.items.forEach((item, j) => {
+            const el = document.getElementById(`eq-ch0-${idx}-${j}`);
+            if (el) katex.render(item.tex, el, { displayMode: true });
+        });
+    });
+}
+
 // ---------- 启动入口 ----------
 window.onload = function () {
     initThree();
     initPip();
+    initChapter0();
     initChapter1();
     initChapter2();
     initChapter3();
     initChapter4();
-    switchChapter(1);
+    switchChapter(0);
     animate();
 };
