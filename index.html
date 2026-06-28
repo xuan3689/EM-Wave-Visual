@@ -96,6 +96,18 @@
                         <div class="slider-header"><span>入射角 (θi)</span><span id="ch2-angle-val">45°</span></div>
                         <input type="range" id="ch2-angle-slider" min="0" max="80" value="45">
                     </div>
+
+                    <!-- 临界角与全反射指示器 -->
+                    <div id="ch2-crit-container" class="mt-3 p-2 rounded border border-slate-800/60 bg-[#0d0f12]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-slate-500">
+                                临界角 θc = <span id="ch2-crit-angle" class="text-slate-300 font-bold">—</span>
+                            </span>
+                            <span id="ch2-tir-badge" class="hidden text-[10px] font-bold text-red-400 px-2 py-0.5 rounded bg-red-900/40 border border-red-800/50">⚡ 全反射</span>
+                        </div>
+                        <p id="ch2-tir-hint" class="text-[10px] text-slate-600 mt-1">n₂ &lt; n₁ 时，入射角超过临界角将发生全反射，折射波变为倏逝表面波</p>
+                    </div>
+
                     <div class="grid-2">
                         <button id="ch2-btn-te" class="btn btn-primary" onclick="setPolarizationCh2('TE')">TE 极化 (E⊥平面)</button>
                         <button id="ch2-btn-tm" class="btn" onclick="setPolarizationCh2('TM')">TM 极化 (E∥平面)</button>

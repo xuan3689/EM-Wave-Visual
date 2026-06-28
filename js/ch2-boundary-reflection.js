@@ -20,6 +20,7 @@ let ch2_boundaryPlane;
 const ch2_rayLines = { inc: null, ref: null, trans: null };
 const ch2_rayStems = { inc: null, ref: null, trans: null };
 let ch2_evanescentLine;
+let ch2_tirOverlay = null;   // 全反射时高亮边界
 
 // ---------- 初始化 ----------
 function initChapter2() {
@@ -113,6 +114,15 @@ function initChapter2() {
         'position', new THREE.BufferAttribute(new Float32Array(100 * 3), 3)
     );
     group.add(ch2_evanescentLine);
+
+    // 6. 全反射边界高亮覆盖层 (默认透明隐藏)
+    const tirOverlayGeo = new THREE.PlaneGeometry(30, 20);
+    const tirOverlayMat = new THREE.MeshBasicMaterial({
+        color: 0xEF4444, transparent: true, opacity: 0, side: THREE.DoubleSide
+    });
+    ch2_tirOverlay = new THREE.Mesh(tirOverlayGeo, tirOverlayMat);
+    ch2_tirOverlay.position.set(0, 0, ch2_config.zInterface + 0.02);
+    group.add(ch2_tirOverlay);
 
     // ---------- 事件绑定 ----------
     document.getElementById('ch2-angle-slider').addEventListener('input', (e) => {
@@ -255,11 +265,19 @@ function updateChapter2() {
             posEva[i * 3 + 2] = zInterface + 0.3;
         }
         ch2_evanescentLine.geometry.attributes.position.needsUpdate = true;
+
+        // 全反射脉冲动画
+        if (ch2_tirOverlay) {
+            const pulse = 0.15 + 0.1 * Math.sin(globalTime * 4.0);
+            ch2_tirOverlay.material.opacity = pulse;
+        }
     } else {
         // 正常折射
         ch2_rayLines.trans.visible = true;
         ch2_rayStems.trans.visible = true;
         ch2_evanescentLine.visible = false;
+
+        if (ch2_tirOverlay) ch2_tirOverlay.material.opacity = 0;
 
         for (let i = 0; i < 100; i++) {
             const s = (i / 99) * s_max2;
@@ -303,14 +321,41 @@ window.setPolarizationCh2 = function (pol) {
     updateMathCh2();
 };
 
-// ---------- 数学公式渲染 ----------
+// ---------- 数学公式渲染 & 全反射界面更新 ----------
 function updateMathCh2() {
     const { theta_i, n1, n2, sigma, polarization } = ch2_config;
     const sin_t = (n1 / n2) * Math.sin(theta_i);
     const tir = sin_t > 1.0;
 
+    // 临界角计算
+    const critAngle = n2 < n1
+        ? (Math.asin(n2 / n1) * 180 / Math.PI).toFixed(1)
+        : null;
+    document.getElementById('ch2-crit-angle').innerText =
+        critAngle ? critAngle + '°' : '— (n₂ ≥ n₁)';
+
+    // 全反射指示器
+    const badge = document.getElementById('ch2-tir-badge');
+    const hint = document.getElementById('ch2-tir-hint');
+    if (tir) {
+        badge.classList.remove('hidden');
+        hint.innerText = '全反射发生！折射波消失，能量全部返回媒质1，沿界面激发表面倏逝波';
+        hint.classList.remove('text-slate-600');
+        hint.classList.add('text-red-400');
+    } else {
+        badge.classList.add('hidden');
+        hint.innerText = critAngle
+            ? `入射角 ${(theta_i * 180 / Math.PI).toFixed(0)}° < 临界角 ${critAngle}°，正常折射`
+            : 'n₂ ≥ n₁ 时不会发生全反射，始终有折射波';
+        hint.classList.remove('text-red-400');
+        hint.classList.add('text-slate-600');
+    }
+
+    // 高亮全反射时相关滑块
+    document.getElementById('ch2-angle-slider').style.accentColor = tir ? '#ef4444' : '';
+
     const mathSnell = tir
-        ? `\\theta_i > \\theta_c \\Rightarrow \\text{激发表面波(倏逝波)，在媒质2中沿z向截止}`
+        ? `\\theta_i (${(theta_i * 180 / Math.PI).toFixed(0)}^\\circ) > \\theta_c (${critAngle}^\\circ) \\Rightarrow \\text{激发表面波(倏逝波)，在媒质2中沿z向截止}`
         : `n_1 \\sin\\theta_i = n_2 \\sin\\theta_t \\Rightarrow \\theta_t \\approx ${Math.round(Math.asin(sin_t) * 180 / Math.PI)}^\\circ`;
 
     const mathFresnel = polarization === 'TE'
