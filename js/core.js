@@ -53,59 +53,7 @@ function initThree() {
     gridHelper.position.y = -5;
     scene.add(gridHelper);
 
-    // 坐标轴指示器 (右下角，颜色与物理语义匹配：E=红, H=蓝, 传播=灰)
-    const axPos = new THREE.Vector3(18, -3, 25);
-    const axisLen = 5;
-
-    function makeAxisLine(from, to, color) {
-        const g = new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(from[0], from[1], from[2]),
-            new THREE.Vector3(to[0], to[1], to[2])
-        ]);
-        const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color }));
-        scene.add(l);
-    }
-    makeAxisLine([axPos.x, axPos.y, axPos.z], [axPos.x + axisLen, axPos.y, axPos.z], 0xEF4444);
-    makeAxisLine([axPos.x, axPos.y, axPos.z], [axPos.x, axPos.y + axisLen, axPos.z], 0x3B82F6);
-    makeAxisLine([axPos.x, axPos.y, axPos.z], [axPos.x, axPos.y, axPos.z + axisLen], 0x94a3b8);
-
-    // 坐标轴文字标签
-    function createAxisLabel(text, color) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 320;
-        canvas.height = 80;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = 'Bold 36px Consolas, "Microsoft YaHei", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)';
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = color;
-        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.needsUpdate = true;
-        const material = new THREE.SpriteMaterial({
-            map: texture, transparent: true,
-            depthTest: false, depthWrite: false
-        });
-        const sprite = new THREE.Sprite(material);
-        sprite.scale.set(7, 1.8, 1);
-        return sprite;
-    }
-
-    const labelX = createAxisLabel('E 电场方向 (x)', '#EF4444');
-    labelX.position.set(axPos.x + 6.5, axPos.y - 0.3, axPos.z);
-    scene.add(labelX);
-
-    const labelY = createAxisLabel('H 磁场方向 (y)', '#3B82F6');
-    labelY.position.set(axPos.x, axPos.y + 6.5, axPos.z);
-    scene.add(labelY);
-
-    const labelZ = createAxisLabel('传播方向 (z)', '#94a3b8');
-    labelZ.position.set(axPos.x, axPos.y - 0.3, axPos.z + 6.5);
-    scene.add(labelZ);
+    // 将四个章节的场景组挂载到主场景
 
     // 将四个章节的场景组挂载到主场景
     for (let key in sceneGroups) {
