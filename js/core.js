@@ -250,9 +250,8 @@ function updateMathCh0() {
             tag: '辐射',
             tagColor: '#d97706',
             items: [
-                { label: '赫兹偶极子近场流函数', tex: '\\psi(r,\\theta,t) = \\sin^2\\theta \\left[ \\frac{\\cos(\\omega t - r)}{r} + \\frac{\\sin(\\omega t - r)}{r^2} \\right]' },
-                { label: '半波振子远场方向图函数', tex: 'F(\\theta) = \\left| \\frac{\\cos\\left(\\frac{\\pi}{2}\\cos\\theta\\right)}{\\sin\\theta} \\right|' },
-                { label: '远区辐射电场', tex: 'E_\\theta = j\\eta \\frac{I_0 e^{-jkr}}{2\\pi r} F(\\theta)' }
+                { label: '电基本振子辐射场方向函数', tex: 'F(\\theta) = \\sin\\theta' },
+                { label: '远区辐射电场', tex: 'E_\\theta = j\\eta \\frac{I_0 l e^{-jkr}}{2\\lambda r} \\sin\\theta' }
             ]
         }
     ];

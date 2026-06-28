@@ -213,36 +213,32 @@
             <!-- ===== 第四章：电磁辐射 ===== -->
             <div id="panel-ch4" class="control-panel">
                 <div>
-                    <div class="section-title">连续空间物理过渡</div>
-                    <div class="slider-wrap mb-2">
-                        <div class="slider-header"><span>归一化观测距离 (r / λ)</span><span id="ch4-dist-val">0.50λ</span></div>
-                        <input type="range" id="ch4-dist-slider" min="0.10" max="4.00" step="0.05" value="0.50">
-                    </div>
+                    <div class="section-title">显示模式切换</div>
                     <div class="grid-2 mt-1">
-                        <button id="ch4-btn-near-shortcut" class="btn btn-primary" onclick="setAntennaPreset('near')">切换近感区</button>
-                        <button id="ch4-btn-far-shortcut" class="btn" onclick="setAntennaPreset('far')">切换远辐射区</button>
+                        <button id="ch4-btn-near" class="btn btn-primary" onclick="setAntennaMode('near')">近场区 (感应场)</button>
+                        <button id="ch4-btn-far" class="btn" onclick="setAntennaMode('far')">远场区 (辐射场)</button>
                     </div>
                 </div>
 
                 <!-- 近场说明 -->
                 <div id="ch4-near-control">
-                    <div class="section-title">偶极子电场线动力学</div>
+                    <div class="section-title">电基本振子近区</div>
                     <p class="text-xs text-slate-400 leading-relaxed bg-[#14171a] p-2.5 rounded border border-slate-800">
-                        <span class="text-red-400 font-bold block mb-1">感应场主导 (1/r³):</span>
-                        严格基于瞬时麦克斯韦方程，实时采用偶极子解析流函数数值生成流场曲线。
-                        在偶极子收缩阶段，场线在根部会发生极化断裂并闭合，最后像波一样剥离并弹射出去，变为独立的辐射场。
+                        <span class="text-red-400 font-bold block mb-1">闭合苹果核形电场线:</span>
+                        红色曲线为闭合的电力线，从偶极子正端发出，在两侧空间划出顺滑椭圆弧后回到负端。
+                        蓝色同心圆环为磁场 H_φ 等相位面。
+                        金色箭头表示电流方向 I·dl，均匀分布无衰减。
                     </p>
                 </div>
 
                 <!-- 远场说明 -->
-                <div id="ch4-pattern-control" class="hidden">
-                    <div class="section-title">半波天线 3D 辐射方向图</div>
-                    <label class="flex items-center gap-2 cursor-pointer bg-[#202326] p-2 rounded border border-[#2F3438]">
-                        <input type="checkbox" id="ch4-show-donut" checked class="w-4 h-4 accent-slate-400">
-                        <span class="text-xs font-semibold text-slate-300">渲染 3D 经典甜甜圈面 (F(θ))</span>
-                    </label>
-                    <p class="text-[10px] text-slate-500 mt-2">
-                        远区中电磁场蜕变为辐射波面。此处渲染了严格物理推导下的半波对称振子三维辐射瓣结构。
+                <div id="ch4-far-control" class="hidden">
+                    <div class="section-title">电基本振子远区</div>
+                    <p class="text-xs text-slate-400 leading-relaxed bg-[#14171a] p-2.5 rounded border border-slate-800">
+                        <span class="text-amber-400 font-bold block mb-1">辐射场:</span>
+                        红色和蓝色环为向外扩散的波前（电场/磁场交替）。<br>
+                        金色线框为 F(θ) = sinθ 的 3D 方向图（面包圈形状）：
+                        水平面辐射最强，天线轴向辐射为零。
                     </p>
                 </div>
 
